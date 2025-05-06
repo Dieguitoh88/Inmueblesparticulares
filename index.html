@@ -249,8 +249,31 @@
   </footer>
 
   <script>
+
+  let fotosCargadas = false;
+
+  // Configurar el widget
+  const widget = uploadcare.Widget('[role=uploadcare-uploader]');
+  widget.onChange((fileGroup) => {
+    if (!fileGroup) return;
+
+    fileGroup.done((groupInfo) => {
+      const urls = groupInfo.files.map(file => file.cdnUrl).join(', ');
+      document.getElementById('fotos').value = urls;
+      fotosCargadas = true;
+    });
+  });
+
   function mostrarPopup(event) {
     event.preventDefault();
+
+    // Validar si las fotos ya fueron cargadas
+    if (!fotosCargadas && document.querySelector('[role=uploadcare-uploader]').value !== '') {
+      alert("Por favor, espera a que las imágenes terminen de cargar.");
+      return;
+    }
+
+    // Mostrar popup y enviar el formulario luego de 2 segundos
     document.getElementById('popup').style.display = 'block';
     setTimeout(() => {
       document.getElementById('formulario-publicar').submit();
@@ -261,16 +284,8 @@
     document.getElementById('popup').style.display = 'none';
   }
 
-  // Capturar correctamente las URLs de todas las imágenes cargadas
-  const widget = uploadcare.Widget('[role=uploadcare-uploader]');
-  widget.onChange((fileGroup) => {
-    if (!fileGroup) return;
 
-    fileGroup.done((groupInfo) => {
-      const urls = groupInfo.files.map(file => file.cdnUrl).join(', ');
-      document.getElementById('fotos').value = urls;
-    });
-  });
+    
   </script>
 </body>
 </html>
