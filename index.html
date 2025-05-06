@@ -248,8 +248,26 @@
 
   <script>
 
+ function prepararYEnviar() {
+    // Validación manual de campos obligatorios
+    const campos = ['titulo', 'tipo', 'direccion', 'ciudad', 'precio', 'descripcion'];
+    for (let id of campos) {
+      const campo = document.getElementById(id);
+      if (!campo.value.trim()) {
+        alert("Por favor completá todos los campos obligatorios.");
+        campo.focus();
+        return;
+      }
+    }
 
-    function prepararYEnviar() {
+    // Validar al menos una opción de operación
+    const operaciones = ['venta', 'permuta', 'alquiler'];
+    if (!operaciones.some(id => document.getElementById(id).checked)) {
+      alert("Seleccioná al menos una opción de operación.");
+      return;
+    }
+
+    // Validar que haya al menos una imagen
     const widget = uploadcare.Widget('#uploadcare-input');
     const value = widget.value();
 
@@ -258,7 +276,7 @@
       return;
     }
 
-    // Si es un grupo de archivos
+    // Manejo de múltiples imágenes
     if (value.startsWith('https://ucarecdn.com/group/')) {
       uploadcare.loadFileGroup(value)
         .then(group => {
@@ -273,7 +291,7 @@
           alert("Error al cargar las imágenes.");
         });
     } else {
-      // Si es un solo archivo
+      // Una sola imagen
       uploadcare.fileFrom('uploaded', value)
         .then(file => file.promise())
         .then(fileInfo => {
