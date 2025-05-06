@@ -252,28 +252,40 @@
 
   let fotosCargadas = false;
 
-  // Configurar el widget
   const widget = uploadcare.Widget('[role=uploadcare-uploader]');
-  widget.onChange((fileGroup) => {
-    if (!fileGroup) return;
+  widget.onUploadComplete((info) => {
+    let urls = [];
 
-    fileGroup.done((groupInfo) => {
-      const urls = groupInfo.files.map(file => file.cdnUrl).join(', ');
-      document.getElementById('fotos').value = urls;
+    if (info.cdnUrl) {
+      // Carga de archivo único
+      urls = [info.cdnUrl];
+    }
+
+    if (info.files) {
+      // Carga de múltiples archivos
+      Promise.all(info.files.map(filePromise => filePromise.promise())).then(files => {
+        urls = files.map(file => file.cdnUrl);
+        document.getElementById('fotos').value = urls.join(', ');
+        fotosCargadas = true;
+      });
+    } else {
+      // Carga de archivo único
+      document.getElementById('fotos').value = urls.join(', ');
       fotosCargadas = true;
-    });
+    }
   });
 
   function mostrarPopup(event) {
     event.preventDefault();
 
-    // Validar si las fotos ya fueron cargadas
-    if (!fotosCargadas && document.querySelector('[role=uploadcare-uploader]').value !== '') {
+    const uploader = document.querySelector('[role=uploadcare-uploader]');
+    const cargando = uploader && uploader.value && !fotosCargadas;
+
+    if (cargando) {
       alert("Por favor, espera a que las imágenes terminen de cargar.");
       return;
     }
 
-    // Mostrar popup y enviar el formulario luego de 2 segundos
     document.getElementById('popup').style.display = 'block';
     setTimeout(() => {
       document.getElementById('formulario-publicar').submit();
