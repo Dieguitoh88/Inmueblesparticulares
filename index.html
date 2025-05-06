@@ -128,6 +128,20 @@
       font-size: 0.9rem;
       color: #777;
     }
+
+    /* Estilo del popup */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #333;
+      color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
   </style>
 </head>
 <body>
@@ -151,7 +165,7 @@
   <!-- Formulario para publicar propiedades -->
   <section id="publicar">
     <h2>Publicar Propiedad</h2>
-    <form id="formulario-publicar" action="#">
+    <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST" onsubmit="mostrarPopup(event)">
       <label for="titulo">Título:</label>
       <input type="text" id="titulo" name="titulo" placeholder="Ej: Departamento en venta" required>
 
@@ -187,8 +201,28 @@
     </form>
   </section>
 
+  <!-- Popup mensaje -->
+  <div class="popup" id="popup">
+    <h3>Su propiedad está en revisión</h3>
+    <p>En menos de 24 horas la verás publicada.</p>
+    <button onclick="cerrarPopup()">Cerrar</button>
+  </div>
+
   <footer>
     <p>© 2025 Inmuebles Particulares - Proyecto independiente para particulares</p>
   </footer>
+
+  <script>
+    // Función para mostrar el mensaje emergente
+    function mostrarPopup(event) {
+      event.preventDefault(); // Evita que el formulario se envíe automáticamente
+      document.getElementById('popup').style.display = 'block'; // Muestra el popup
+    }
+
+    // Función para cerrar el popup
+    function cerrarPopup() {
+      document.getElementById('popup').style.display = 'none'; // Oculta el popup
+    }
+  </script>
 </body>
 </html>
