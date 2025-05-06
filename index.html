@@ -249,25 +249,33 @@
   </footer>
 
   <script>
-    function mostrarPopup(event) {
-      event.preventDefault();
-      document.getElementById('popup').style.display = 'block';
-      setTimeout(() => {
-        document.getElementById('formulario-publicar').submit();
-      }, 2000);
-    }
+  function mostrarPopup(event) {
+    event.preventDefault();
 
-    function cerrarPopup() {
-      document.getElementById('popup').style.display = 'none';
-    }
-
-    // Guardar las URLs cargadas en el campo oculto "fotos"
-    uploadcare.registerTab('file', uploadcareTabEffects);
     const widget = uploadcare.Widget('[role=uploadcare-uploader]');
-    widget.onUploadComplete((info) => {
-      let urls = Array.isArray(info) ? info.map(i => i.cdnUrl) : [info.cdnUrl];
-      document.getElementById('fotos').value = urls.join(', ');
+    widget.value().promise().then((files) => {
+      if (!files || files.length === 0) {
+        alert("Debes subir al menos una foto.");
+        return;
+      }
+
+      const filePromises = files.files();
+      Promise.all(filePromises.map(f => f.promise())).then((fileInfos) => {
+        const urls = fileInfos.map(f => f.cdnUrl).join(', ');
+        document.getElementById('fotos').value = urls;
+
+        document.getElementById('popup').style.display = 'block';
+
+        setTimeout(() => {
+          document.getElementById('formulario-publicar').submit();
+        }, 2000);
+      });
     });
+  }
+
+  function cerrarPopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
   </script>
 </body>
 </html>
