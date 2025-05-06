@@ -249,25 +249,44 @@
   </footer>
 
   <script>
-    function mostrarPopup(event) {
-      event.preventDefault();
-      document.getElementById('popup').style.display = 'block';
-      setTimeout(() => {
-        document.getElementById('formulario-publicar').submit();
-      }, 2000);
+  let fotosCargadas = false;
+  const formulario = document.getElementById('formulario-publicar');
+  const popup = document.getElementById('popup');
+  const boton = formulario.querySelector('button[type="submit"]');
+  const campoFotos = document.getElementById('fotos');
+
+  boton.disabled = true; // Desactivar hasta que se suban imágenes
+
+  // Configurar Uploadcare
+  uploadcare.registerTab('file', uploadcareTabEffects);
+  const widget = uploadcare.Widget('[role=uploadcare-uploader]');
+  widget.onUploadComplete((info) => {
+    let urls = Array.isArray(info) ? info.map(i => i.cdnUrl) : [info.cdnUrl];
+    campoFotos.value = urls.join(', ');
+    fotosCargadas = true;
+    boton.disabled = false; // Habilitar botón cuando las fotos estén
+  });
+
+  // Validar antes de mostrar popup y enviar
+  function mostrarPopup(event) {
+    event.preventDefault();
+
+    // Validar que las fotos se hayan cargado
+    if (!fotosCargadas || campoFotos.value.trim() === '') {
+      alert('Por favor, subí al menos una foto antes de publicar.');
+      return;
     }
 
-    function cerrarPopup() {
-      document.getElementById('popup').style.display = 'none';
-    }
+    // Mostrar popup y enviar formulario
+    popup.style.display = 'block';
+    setTimeout(() => {
+      formulario.submit();
+    }, 2000);
+  }
 
-    // Guardar las URLs cargadas en el campo oculto "fotos"
-    uploadcare.registerTab('file', uploadcareTabEffects);
-    const widget = uploadcare.Widget('[role=uploadcare-uploader]');
-    widget.onUploadComplete((info) => {
-      let urls = Array.isArray(info) ? info.map(i => i.cdnUrl) : [info.cdnUrl];
-      document.getElementById('fotos').value = urls.join(', ');
-    });
+  function cerrarPopup() {
+    popup.style.display = 'none';
+  }
   </script>
 </body>
 </html>
