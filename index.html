@@ -247,57 +247,41 @@
   </footer>
 
   <script>
-  function prepararYEnviar() {
+
+
+    function prepararYEnviar() {
     const widget = uploadcare.Widget('#uploadcare-input');
-
-    // Esperamos hasta que el widget haya finalizado la carga
-    widget.onUploadComplete(function (fileInfoOrGroup) {
-      let urls = "";
-
-      if (fileInfoOrGroup.cdnUrl) {
-        // Es un solo archivo
-        urls = fileInfoOrGroup.cdnUrl;
-      } else if (fileInfoOrGroup.files) {
-        // Es un grupo de archivos
-        const files = fileInfoOrGroup.files();
-        Promise.all(files.map(f => f.promise())).then(fileInfos => {
-          urls = fileInfos.map(f => f.cdnUrl).join('\n');
-          enviarFormulario(urls);
-        }).catch(() => {
-          alert("Error al procesar las imágenes.");
-          document.getElementById('popup').style.display = 'none';
-        });
-        return;
-      }
-
-      enviarFormulario(urls);
-    });
-
-    // Llama manualmente al widget para abrir el cargador si no hay imágenes aún
     const value = widget.value();
+
     if (!value) {
       alert("Debes subir al menos una imagen.");
-    } else {
-      // Si ya hay imágenes cargadas (por selección previa), obtenemos el archivo o grupo actual
-      if (value.startsWith("https://ucarecdn.com/group/")) {
-        uploadcare.loadFileGroup(value).then(group => {
+      return;
+    }
+
+    // Si es un grupo de archivos
+    if (value.startsWith('https://ucarecdn.com/group/')) {
+      uploadcare.loadFileGroup(value)
+        .then(group => {
           const files = group.files();
-          Promise.all(files.map(f => f.promise())).then(fileInfos => {
-            const urls = fileInfos.map(f => f.cdnUrl).join('\n');
-            enviarFormulario(urls);
-          });
-        }).catch(() => {
+          return Promise.all(files.map(f => f.promise()));
+        })
+        .then(fileInfos => {
+          const urls = fileInfos.map(f => f.cdnUrl).join('\n');
+          enviarFormulario(urls);
+        })
+        .catch(() => {
           alert("Error al cargar las imágenes.");
         });
-      } else {
-        uploadcare.fileFrom('uploaded', value).then(file => {
-          return file.promise();
-        }).then(fileInfo => {
+    } else {
+      // Si es un solo archivo
+      uploadcare.fileFrom('uploaded', value)
+        .then(file => file.promise())
+        .then(fileInfo => {
           enviarFormulario(fileInfo.cdnUrl);
-        }).catch(() => {
+        })
+        .catch(() => {
           alert("Error al cargar la imagen.");
         });
-      }
     }
   }
 
@@ -313,6 +297,8 @@
   function cerrarPopup() {
     document.getElementById('popup').style.display = 'none';
   }
+
+    
   </script>
 </body>
 </html>
