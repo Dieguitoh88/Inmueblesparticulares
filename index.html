@@ -186,12 +186,11 @@
     </div>
   </section>
 
-  <!-- Formulario para publicar propiedades -->
   <section id="publicar">
     <h2>Publicar Propiedad</h2>
     <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST">
       <label for="titulo">Título:</label>
-      <input type="text" id="titulo" name="titulo" placeholder="Ej: Departamento en venta" required>
+      <input type="text" id="titulo" name="titulo" required>
 
       <label for="tipo">Tipo de propiedad:</label>
       <select id="tipo" name="tipo" required>
@@ -210,16 +209,16 @@
       <label for="alquiler">Alquiler</label>
 
       <label for="direccion">Dirección:</label>
-      <input type="text" id="direccion" name="direccion" placeholder="Ej: Av. 9 de Julio 1234" required>
+      <input type="text" id="direccion" name="direccion" required>
 
       <label for="ciudad">Ciudad:</label>
-      <input type="text" id="ciudad" name="ciudad" placeholder="Ej: Buenos Aires" required>
+      <input type="text" id="ciudad" name="ciudad" required>
 
       <label for="precio">Precio ($):</label>
       <input type="number" id="precio" name="precio" required>
 
       <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion" name="descripcion" placeholder="Describe el inmueble" required></textarea>
+      <textarea id="descripcion" name="descripcion" required></textarea>
 
       <label for="fotos">Fotos (máx. 8):</label>
       <input
@@ -237,7 +236,6 @@
     </form>
   </section>
 
-  <!-- Popup mensaje -->
   <div class="popup" id="popup">
     <h3>Tu propiedad está en revisión</h3>
     <p>En menos de 24 horas la verás publicada.</p>
@@ -250,7 +248,6 @@
 
   <script>
     let widget;
-
     document.addEventListener("DOMContentLoaded", function () {
       widget = uploadcare.Widget('#uploadcare-input');
     });
@@ -263,20 +260,21 @@
         return;
       }
 
-      value.promise().then(fileGroup => {
-        if (!fileGroup) {
-          alert("Error al procesar las imágenes.");
-          return;
-        }
-
-        const files = fileGroup.files();
-        Promise.all(files.map(f => f.promise())).then(fileInfos => {
-          const urls = fileInfos.map(f => f.cdnUrl).join('\n');
-          document.getElementById('fotos').value = urls;
-
+      uploadcare.fileFrom('uploaded', value).done(function (file) {
+        file.promise().then(function (info) {
+          document.getElementById('fotos').value = info.cdnUrl;
           document.getElementById('popup').style.display = 'block';
 
           setTimeout(() => {
             document.getElementById('formulario-publicar').submit();
           }, 2000);
         });
+      });
+    }
+
+    function cerrarPopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
