@@ -249,8 +249,13 @@
   </footer>
 
   <script>
+    let widget;
+
+    document.addEventListener("DOMContentLoaded", function () {
+      widget = uploadcare.Widget('#uploadcare-input');
+    });
+
     function prepararYEnviar() {
-      const widget = uploadcare.Widget('#uploadcare-input');
       const value = widget.value();
 
       if (!value) {
@@ -275,12 +280,3 @@
             document.getElementById('formulario-publicar').submit();
           }, 2000);
         });
-      });
-    }
-
-    function cerrarPopup() {
-      document.getElementById('popup').style.display = 'none';
-    }
-  </script>
-</body>
-</html>
