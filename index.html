@@ -249,44 +249,28 @@
   </footer>
 
   <script>
-  let fotosCargadas = false;
-  const formulario = document.getElementById('formulario-publicar');
-  const popup = document.getElementById('popup');
-  const boton = formulario.querySelector('button[type="submit"]');
-  const campoFotos = document.getElementById('fotos');
-
-  boton.disabled = true; // Desactivar hasta que se suban imágenes
-
-  // Configurar Uploadcare
-  uploadcare.registerTab('file', uploadcareTabEffects);
-  const widget = uploadcare.Widget('[role=uploadcare-uploader]');
-  widget.onUploadComplete((info) => {
-    let urls = Array.isArray(info) ? info.map(i => i.cdnUrl) : [info.cdnUrl];
-    campoFotos.value = urls.join(', ');
-    fotosCargadas = true;
-    boton.disabled = false; // Habilitar botón cuando las fotos estén
-  });
-
-  // Validar antes de mostrar popup y enviar
   function mostrarPopup(event) {
     event.preventDefault();
-
-    // Validar que las fotos se hayan cargado
-    if (!fotosCargadas || campoFotos.value.trim() === '') {
-      alert('Por favor, subí al menos una foto antes de publicar.');
-      return;
-    }
-
-    // Mostrar popup y enviar formulario
-    popup.style.display = 'block';
+    document.getElementById('popup').style.display = 'block';
     setTimeout(() => {
-      formulario.submit();
+      document.getElementById('formulario-publicar').submit();
     }, 2000);
   }
 
   function cerrarPopup() {
-    popup.style.display = 'none';
+    document.getElementById('popup').style.display = 'none';
   }
+
+  // Capturar correctamente las URLs de todas las imágenes cargadas
+  const widget = uploadcare.Widget('[role=uploadcare-uploader]');
+  widget.onChange((fileGroup) => {
+    if (!fileGroup) return;
+
+    fileGroup.done((groupInfo) => {
+      const urls = groupInfo.files.map(file => file.cdnUrl).join(', ');
+      document.getElementById('fotos').value = urls;
+    });
+  });
   </script>
 </body>
 </html>
