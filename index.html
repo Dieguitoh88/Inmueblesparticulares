@@ -163,43 +163,52 @@
   </section>
 
   <!-- Formulario para publicar propiedades -->
-  <section id="publicar">
-    <h2>Publicar Propiedad</h2>
-    <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST" onsubmit="mostrarPopup(event)">
-      <label for="titulo">Título:</label>
-      <input type="text" id="titulo" name="titulo" placeholder="Ej: Departamento en venta" required>
+<section id="publicar">
+  <h2>Publicar Propiedad</h2>
+  <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST" onsubmit="mostrarPopup(event)">
+    <label for="titulo">Título:</label>
+    <input type="text" id="titulo" name="titulo" placeholder="Ej: Departamento en venta" required>
 
-      <label for="tipo">Tipo de propiedad:</label>
-      <select id="tipo" name="tipo" required>
-        <option value="departamento">Departamento</option>
-        <option value="casa">Casa</option>
-        <option value="terreno">Terreno</option>
-        <option value="local">Local comercial</option>
-      </select>
+    <label for="tipo">Tipo de propiedad:</label>
+    <select id="tipo" name="tipo" required>
+      <option value="departamento">Departamento</option>
+      <option value="casa">Casa</option>
+      <option value="terreno">Terreno</option>
+      <option value="local">Local comercial</option>
+    </select>
 
-      <label>Operación:</label>
-      <input type="checkbox" id="venta" name="operacion" value="venta">
-      <label for="venta">Venta</label>
-      <input type="checkbox" id="permuta" name="operacion" value="permuta">
-      <label for="permuta">Permuta</label>
-      <input type="checkbox" id="alquiler" name="operacion" value="alquiler">
-      <label for="alquiler">Alquiler</label>
+    <label>Operación:</label>
+    <input type="checkbox" id="venta" name="operacion" value="venta">
+    <label for="venta">Venta</label>
+    <input type="checkbox" id="permuta" name="operacion" value="permuta">
+    <label for="permuta">Permuta</label>
+    <input type="checkbox" id="alquiler" name="operacion" value="alquiler">
+    <label for="alquiler">Alquiler</label>
 
-      <label for="direccion">Dirección:</label>
-      <input type="text" id="direccion" name="direccion" placeholder="Ej: Av. 9 de Julio 1234" required>
+    <label for="direccion">Dirección:</label>
+    <input type="text" id="direccion" name="direccion" placeholder="Ej: Av. 9 de Julio 1234" required>
 
-      <label for="ciudad">Ciudad:</label>
-      <input type="text" id="ciudad" name="ciudad" placeholder="Ej: Buenos Aires" required>
+    <label for="ciudad">Ciudad:</label>
+    <input type="text" id="ciudad" name="ciudad" placeholder="Ej: Buenos Aires" required>
 
-      <label for="precio">Precio ($):</label>
-      <input type="number" id="precio" name="precio" required>
+    <label for="precio">Precio ($):</label>
+    <input type="number" id="precio" name="precio" required>
 
-      <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion" name="descripcion" placeholder="Describe el inmueble" required></textarea>
+    <label for="descripcion">Descripción:</label>
+    <textarea id="descripcion" name="descripcion" placeholder="Describe el inmueble" required></textarea>
 
-      <button type="submit">Publicar Propiedad</button>
-    </form>
-  </section>
+    <!-- Campo para fotos -->
+    <label for="fotos">Links de fotos (máx. 8):</label>
+    <textarea id="fotos" name="fotos" placeholder="Pegá acá los enlaces compartibles de tus fotos subidas a Google Drive" required></textarea>
+    <small>
+      🔗 Subí tus fotos a 
+      <a href="https://drive.google.com/drive/folders/1kXzSIz-8IqZOp-hD8PnVUps213sTO3qz?usp=drive_link" target="_blank">esta carpeta</a>. 
+      Luego hacé clic derecho en cada foto, seleccioná "Obtener enlace", y pegá los links arriba.
+    </small>
+
+    <button type="submit">Publicar Propiedad</button>
+  </form>
+</section>
 
   <!-- Popup mensaje -->
   <div class="popup" id="popup">
