@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inmuebles Particulares</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
   <style>
     :root {
       --primary: #00ffe0;
@@ -197,14 +198,10 @@
     <label for="descripcion">Descripción:</label>
     <textarea id="descripcion" name="descripcion" placeholder="Describe el inmueble" required></textarea>
 
-    <!-- Campo para fotos -->
- <label for="fotos">Links de fotos (máx. 8):</label>
-<textarea id="fotos" name="fotos" placeholder="Pegá acá los enlaces compartibles de tus fotos subidas a Google Drive" required></textarea>
-<small>
-  🔗 Subí tus fotos a 
-  <a href="https://drive.google.com/drive/folders/..." target="_blank">esta carpeta</a>. 
-  Luego hacé clic derecho en cada foto, seleccioná "Obtener enlace", y pegá los links arriba.
-</small>
+    <!-- Campo para fotos usando Uploadcare -->
+    <label for="fotos">Fotos de la propiedad (hasta 8):</label>
+    <input type="hidden" name="fotos" id="fotos" required>
+    <div class="uploadcare" id="fotos-widget"></div>
 
     <button type="submit">Publicar Propiedad</button>
   </form>
@@ -222,20 +219,29 @@
   </footer>
 
   <script>
-  function mostrarPopup(event) {
-    event.preventDefault(); // Evita el envío automático
+    // Subir archivo a Uploadcare y obtener el enlace
+    var widget = uploadcare.Widget('[id="fotos-widget"]', {
+      publicKey: '15b2cae519cdad4a4007'
+    });
 
-    document.getElementById('popup').style.display = 'block'; // Muestra el popup
+    widget.onUploadComplete(function(info) {
+      // Aquí guardamos el enlace del archivo subido en el campo oculto
+      document.getElementById('fotos').value = info.cdnUrl;
+    });
 
-    // Esperar 2 segundos y luego enviar el formulario
-    setTimeout(() => {
-      document.getElementById('formulario-publicar').submit();
-    }, 2000);
-  }
+    function mostrarPopup(event) {
+      event.preventDefault(); // Evita el envío automático
+      document.getElementById('popup').style.display = 'block'; // Muestra el popup
 
-  function cerrarPopup() {
-    document.getElementById('popup').style.display = 'none';
-  }
+      // Esperar 2 segundos y luego enviar el formulario
+      setTimeout(() => {
+        document.getElementById('formulario-publicar').submit();
+      }, 2000);
+    }
+
+    function cerrarPopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
   </script>
 </body>
 </html>
