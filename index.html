@@ -5,43 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inmuebles Particulares</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- Uploadcare -->
   <script>
+    UPLOADCARE_PUBLIC_KEY = "15b2cae519cdad4a4007";
     UPLOADCARE_LOCALE = "es";
     UPLOADCARE_LOCALE_TRANSLATIONS = {
       buttons: {
         choose: {
           files: {
-            one: 'Agregar foto',
-            other: 'Agregar fotos'
+            one: 'Subir imagen',
+            other: 'Subir imágenes'
           },
           images: {
-            one: 'Agregar imagen',
-            other: 'Agregar imágenes'
+            one: 'Elegir imagen',
+            other: 'Elegir imágenes'
           }
         },
         cancel: 'Cancelar',
         remove: 'Remover',
         removeAll: 'Remover todas',
-        edit: 'Editar',
-        crop: 'Recortar'
-      },
-      dialog: {
-        tabs: {
-          preview: 'Vista previa',
-          file: 'Archivo',
-          url: 'Enlace'
-        },
-        done: 'Subir'
+        addMore: 'Agregar'
       }
     };
   </script>
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
-  <script>
-    uploadcare.start({ publicKey: '15b2cae519cdad4a4007' });
-  </script>
-
   <style>
     :root {
       --primary: #00ffe0;
@@ -49,17 +35,20 @@
       --text: #ffffff;
       --accent: #ff0077;
     }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: 'Orbitron', sans-serif;
     }
+
     body {
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.6;
     }
+
     header {
       background: #111;
       padding: 1rem 2rem;
@@ -68,36 +57,44 @@
       align-items: center;
       box-shadow: 0 2px 10px #000;
     }
+
     header h1 {
       color: var(--primary);
       font-size: 1.5rem;
     }
+
     nav a {
       color: var(--text);
       margin-left: 1.5rem;
       text-decoration: none;
       transition: color 0.2s;
     }
+
     nav a:hover {
       color: var(--accent);
     }
+
     .hero {
       text-align: center;
       padding: 5rem 2rem;
     }
+
     .hero h2 {
       font-size: 2.5rem;
       color: var(--primary);
       margin-bottom: 1rem;
     }
+
     .hero p {
       font-size: 1.2rem;
       max-width: 600px;
       margin: 0 auto;
     }
+
     .cta {
       margin-top: 2rem;
     }
+
     .cta a {
       background: var(--accent);
       color: #fff;
@@ -107,27 +104,34 @@
       font-weight: bold;
       transition: background 0.3s;
     }
+
     .cta a:hover {
       background: #e6006e;
     }
+
     section {
       margin: 2rem 0;
       padding: 2rem;
       background: #222;
       border-radius: 10px;
     }
+
     #formulario-publicar {
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
-    #formulario-publicar input, #formulario-publicar select, #formulario-publicar textarea {
+
+    #formulario-publicar input,
+    #formulario-publicar select,
+    #formulario-publicar textarea {
       padding: 0.5rem;
       border-radius: 5px;
       border: 1px solid #333;
       background-color: #222;
       color: #fff;
     }
+
     button {
       background-color: var(--primary);
       color: #111;
@@ -138,15 +142,18 @@
       cursor: pointer;
       transition: background 0.3s;
     }
+
     button:hover {
       background-color: #00ccaa;
     }
+
     footer {
       text-align: center;
       padding: 2rem;
       font-size: 0.9rem;
       color: #777;
     }
+
     .popup {
       display: none;
       position: fixed;
@@ -179,11 +186,12 @@
     </div>
   </section>
 
+  <!-- Formulario para publicar propiedades -->
   <section id="publicar">
     <h2>Publicar Propiedad</h2>
-    <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST" onsubmit="mostrarPopup(event)">
+    <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST">
       <label for="titulo">Título:</label>
-      <input type="text" id="titulo" name="titulo" required>
+      <input type="text" id="titulo" name="titulo" placeholder="Ej: Departamento en venta" required>
 
       <label for="tipo">Tipo de propiedad:</label>
       <select id="tipo" name="tipo" required>
@@ -202,34 +210,34 @@
       <label for="alquiler">Alquiler</label>
 
       <label for="direccion">Dirección:</label>
-      <input type="text" id="direccion" name="direccion" required>
+      <input type="text" id="direccion" name="direccion" placeholder="Ej: Av. 9 de Julio 1234" required>
 
       <label for="ciudad">Ciudad:</label>
-      <input type="text" id="ciudad" name="ciudad" required>
+      <input type="text" id="ciudad" name="ciudad" placeholder="Ej: Buenos Aires" required>
 
       <label for="precio">Precio ($):</label>
       <input type="number" id="precio" name="precio" required>
 
       <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion" name="descripcion" required></textarea>
+      <textarea id="descripcion" name="descripcion" placeholder="Describe el inmueble" required></textarea>
 
-      <label for="uploadcare">Fotos (máx. 8):</label>
-      <input 
-        type="hidden" 
-        role="uploadcare-uploader" 
-        data-multiple 
-        data-multiple-max="8" 
-        data-clearable 
-        data-images-only 
+      <label for="fotos">Fotos (máx. 8):</label>
+      <input
+        type="hidden"
+        role="uploadcare-uploader"
+        data-multiple
+        data-multiple-max="8"
+        data-clearable
+        data-images-only
+        id="uploadcare-input"
       />
+      <input type="hidden" name="fotos" id="fotos" />
 
-      <!-- Campo oculto que recibirá los links de las imágenes -->
-      <input type="hidden" id="fotos" name="fotos" />
-
-      <button type="submit">Publicar Propiedad</button>
+      <button type="button" onclick="prepararYEnviar()">Publicar Propiedad</button>
     </form>
   </section>
 
+  <!-- Popup mensaje -->
   <div class="popup" id="popup">
     <h3>Tu propiedad está en revisión</h3>
     <p>En menos de 24 horas la verás publicada.</p>
@@ -240,21 +248,25 @@
     <p>© 2025 Inmuebles Particulares - Proyecto independiente para particulares</p>
   </footer>
 
-  <!-- Script de carga y envío -->
   <script>
-    function mostrarPopup(event) {
-      event.preventDefault();
+    function prepararYEnviar() {
+      const widget = uploadcare.Widget('#uploadcare-input');
+      const value = widget.value();
 
-      const widget = uploadcare.Widget('[role=uploadcare-uploader]');
-      widget.value().promise().then((files) => {
-        if (!files || files.length === 0) {
-          alert("Debes subir al menos una foto.");
+      if (!value) {
+        alert("Debes subir al menos una imagen.");
+        return;
+      }
+
+      value.promise().then(fileGroup => {
+        if (!fileGroup) {
+          alert("Error al procesar las imágenes.");
           return;
         }
 
-        const filePromises = files.files();
-        Promise.all(filePromises.map(f => f.promise())).then((fileInfos) => {
-          const urls = fileInfos.map(f => f.cdnUrl).join('\n'); // Enlaces en líneas separadas
+        const files = fileGroup.files();
+        Promise.all(files.map(f => f.promise())).then(fileInfos => {
+          const urls = fileInfos.map(f => f.cdnUrl).join('\n');
           document.getElementById('fotos').value = urls;
 
           document.getElementById('popup').style.display = 'block';
