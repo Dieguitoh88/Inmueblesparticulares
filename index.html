@@ -2,28 +2,28 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inmuebles Particulares</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <script>
-    UPLOADCARE_PUBLIC_KEY = "15b2cae519cdad4a4007";
-    UPLOADCARE_LOCALE = "es";
+    UPLOADCARE_PUBLIC_KEY = '15b2cae519cdad4a4007';
+    UPLOADCARE_LOCALE = 'es';
     UPLOADCARE_LOCALE_TRANSLATIONS = {
       buttons: {
         choose: {
           files: {
-            one: 'Subir imagen',
-            other: 'Subir imágenes'
+            one: 'Subir foto',
+            other: 'Subir fotos'
           },
           images: {
-            one: 'Elegir imagen',
-            other: 'Elegir imágenes'
+            one: 'Subir imagen',
+            other: 'Subir imágenes'
           }
         },
         cancel: 'Cancelar',
         remove: 'Remover',
         removeAll: 'Remover todas',
-        addMore: 'Agregar'
+        addMore: 'Agregar más'
       }
     };
   </script>
@@ -35,16 +35,20 @@
       --text: #ffffff;
       --accent: #ff0077;
     }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: 'Orbitron', sans-serif;
     }
+
     body {
       background-color: var(--bg);
       color: var(--text);
+      line-height: 1.6;
     }
+
     header {
       background: #111;
       padding: 1rem 2rem;
@@ -53,36 +57,44 @@
       align-items: center;
       box-shadow: 0 2px 10px #000;
     }
+
     header h1 {
       color: var(--primary);
       font-size: 1.5rem;
     }
+
     nav a {
       color: var(--text);
       margin-left: 1.5rem;
       text-decoration: none;
       transition: color 0.2s;
     }
+
     nav a:hover {
       color: var(--accent);
     }
+
     .hero {
       text-align: center;
       padding: 5rem 2rem;
     }
+
     .hero h2 {
       font-size: 2.5rem;
       color: var(--primary);
       margin-bottom: 1rem;
     }
+
     .hero p {
       font-size: 1.2rem;
       max-width: 600px;
       margin: 0 auto;
     }
+
     .cta {
       margin-top: 2rem;
     }
+
     .cta a {
       background: var(--accent);
       color: #fff;
@@ -92,20 +104,24 @@
       font-weight: bold;
       transition: background 0.3s;
     }
+
     .cta a:hover {
       background: #e6006e;
     }
+
     section {
       margin: 2rem 0;
       padding: 2rem;
       background: #222;
       border-radius: 10px;
     }
+
     #formulario-publicar {
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
+
     #formulario-publicar input,
     #formulario-publicar select,
     #formulario-publicar textarea {
@@ -115,6 +131,7 @@
       background-color: #222;
       color: #fff;
     }
+
     button {
       background-color: var(--primary);
       color: #111;
@@ -125,15 +142,18 @@
       cursor: pointer;
       transition: background 0.3s;
     }
+
     button:hover {
       background-color: #00ccaa;
     }
+
     footer {
       text-align: center;
       padding: 2rem;
       font-size: 0.9rem;
       color: #777;
     }
+
     .popup {
       display: none;
       position: fixed;
@@ -168,13 +188,12 @@
 
   <section id="publicar">
     <h2>Publicar Propiedad</h2>
-    <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST">
+    <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST" onsubmit="mostrarPopup(event)">
       <label for="titulo">Título:</label>
-      <input type="text" id="titulo" name="titulo" required>
+      <input type="text" id="titulo" name="titulo" placeholder="Ej: Departamento en venta" required>
 
       <label for="tipo">Tipo de propiedad:</label>
       <select id="tipo" name="tipo" required>
-        <option value="">Seleccionar</option>
         <option value="departamento">Departamento</option>
         <option value="casa">Casa</option>
         <option value="terreno">Terreno</option>
@@ -190,35 +209,37 @@
       <label for="alquiler">Alquiler</label>
 
       <label for="direccion">Dirección:</label>
-      <input type="text" id="direccion" name="direccion" required>
+      <input type="text" id="direccion" name="direccion" placeholder="Ej: Av. 9 de Julio 1234" required>
 
       <label for="ciudad">Ciudad:</label>
-      <input type="text" id="ciudad" name="ciudad" required>
+      <input type="text" id="ciudad" name="ciudad" placeholder="Ej: Buenos Aires" required>
 
       <label for="precio">Precio ($):</label>
       <input type="number" id="precio" name="precio" required>
 
       <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion" name="descripcion" required></textarea>
+      <textarea id="descripcion" name="descripcion" placeholder="Describe el inmueble" required></textarea>
 
+      <!-- Fotos con Uploadcare -->
       <label for="fotos">Fotos (máx. 8):</label>
+      <input type="hidden" name="fotos" id="fotos">
       <input
         type="hidden"
         role="uploadcare-uploader"
-        data-multiple
+        data-multiple="true"
+        data-images-only="true"
         data-multiple-max="8"
-        data-clearable
-        data-images-only
-        id="uploadcare-input"
+        data-tabs="file camera"
+        data-clearable="true"
+        data-preview-step="true"
       />
-      <input type="hidden" name="fotos" id="fotos" />
 
-      <button type="button" onclick="prepararYEnviar()">Publicar Propiedad</button>
+      <button type="submit">Publicar Propiedad</button>
     </form>
   </section>
 
   <div class="popup" id="popup">
-    <h3>Tu propiedad está en revisión</h3>
+    <h3>Su propiedad está en revisión</h3>
     <p>En menos de 24 horas la verás publicada.</p>
     <button onclick="cerrarPopup()">Cerrar</button>
   </div>
@@ -228,57 +249,25 @@
   </footer>
 
   <script>
-
-  function prepararYEnviar() {
-    const widget = uploadcare.Widget('#uploadcare-input');
-    const value = widget.value();
-
-    if (!value) {
-      alert("Debes subir al menos una imagen.");
-      return;
+    function mostrarPopup(event) {
+      event.preventDefault();
+      document.getElementById('popup').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('formulario-publicar').submit();
+      }, 2000);
     }
 
-    // Si es un grupo de archivos
-    if (value.startsWith('https://ucarecdn.com/group/')) {
-      uploadcare.loadFileGroup(value)
-        .then(group => {
-          const files = group.files();
-          return Promise.all(files.map(f => f.promise()));
-        })
-        .then(fileInfos => {
-          const urls = fileInfos.map(f => f.cdnUrl).join('\n');
-          enviarFormulario(urls);
-        })
-        .catch(() => {
-          alert("Error al cargar las imágenes.");
-        });
-    } else {
-      // Si es un solo archivo
-      uploadcare.fileFrom('uploaded', value)
-        .then(file => file.promise())
-        .then(fileInfo => {
-          enviarFormulario(fileInfo.cdnUrl);
-        })
-        .catch(() => {
-          alert("Error al cargar la imagen.");
-        });
+    function cerrarPopup() {
+      document.getElementById('popup').style.display = 'none';
     }
-  }
 
-  function enviarFormulario(urls) {
-    document.getElementById('fotos').value = urls;
-    document.getElementById('popup').style.display = 'block';
-
-    setTimeout(() => {
-      document.getElementById('formulario-publicar').submit();
-    }, 2000);
-  }
-
-  function cerrarPopup() {
-    document.getElementById('popup').style.display = 'none';
-  }
-
-    
+    // Guardar las URLs cargadas en el campo oculto "fotos"
+    uploadcare.registerTab('file', uploadcareTabEffects);
+    const widget = uploadcare.Widget('[role=uploadcare-uploader]');
+    widget.onUploadComplete((info) => {
+      let urls = Array.isArray(info) ? info.map(i => i.cdnUrl) : [info.cdnUrl];
+      document.getElementById('fotos').value = urls.join(', ');
+    });
   </script>
 </body>
 </html>
