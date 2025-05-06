@@ -2,10 +2,32 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inmuebles Particulares</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-  <script type="text/javascript" src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
+  <script>
+    UPLOADCARE_PUBLIC_KEY = '15b2cae519cdad4a4007';
+    UPLOADCARE_LOCALE = 'es';
+    UPLOADCARE_LOCALE_TRANSLATIONS = {
+      buttons: {
+        choose: {
+          files: {
+            one: 'Subir foto',
+            other: 'Subir fotos'
+          },
+          images: {
+            one: 'Subir imagen',
+            other: 'Subir imágenes'
+          }
+        },
+        cancel: 'Cancelar',
+        remove: 'Remover',
+        removeAll: 'Remover todas',
+        addMore: 'Agregar más'
+      }
+    };
+  </script>
+  <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
   <style>
     :root {
       --primary: #00ffe0;
@@ -100,7 +122,9 @@
       gap: 1rem;
     }
 
-    #formulario-publicar input, #formulario-publicar select, #formulario-publicar textarea {
+    #formulario-publicar input,
+    #formulario-publicar select,
+    #formulario-publicar textarea {
       padding: 0.5rem;
       border-radius: 5px;
       border: 1px solid #333;
@@ -130,7 +154,6 @@
       color: #777;
     }
 
-    /* Estilo del popup */
     .popup {
       display: none;
       position: fixed;
@@ -163,7 +186,6 @@
     </div>
   </section>
 
-  <!-- Formulario para publicar propiedades -->
   <section id="publicar">
     <h2>Publicar Propiedad</h2>
     <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST" onsubmit="mostrarPopup(event)">
@@ -198,16 +220,24 @@
       <label for="descripcion">Descripción:</label>
       <textarea id="descripcion" name="descripcion" placeholder="Describe el inmueble" required></textarea>
 
-      <!-- Campo para fotos usando Uploadcare -->
-      <label for="fotos">Fotos de la propiedad (hasta 8):</label>
-      <input type="hidden" name="fotos" id="fotos" required>
-      <div class="uploadcare" id="fotos-widget"></div>
+      <!-- Fotos con Uploadcare -->
+      <label for="fotos">Fotos (máx. 8):</label>
+      <input type="hidden" name="fotos" id="fotos">
+      <input
+        type="hidden"
+        role="uploadcare-uploader"
+        data-multiple="true"
+        data-images-only="true"
+        data-multiple-max="8"
+        data-tabs="file camera"
+        data-clearable="true"
+        data-preview-step="true"
+      />
 
       <button type="submit">Publicar Propiedad</button>
     </form>
   </section>
 
-  <!-- Popup mensaje -->
   <div class="popup" id="popup">
     <h3>Su propiedad está en revisión</h3>
     <p>En menos de 24 horas la verás publicada.</p>
@@ -219,32 +249,9 @@
   </footer>
 
   <script>
-    // Configuración de Uploadcare para permitir múltiples fotos y mantener la opción de carga abierta
-    var widget = uploadcare.Widget('#fotos-widget', {
-      publicKey: '15b2cae519cdad4a4007',
-      multiple: true, // Permite seleccionar varias fotos
-      imagesOnly: true, // Solo permite imágenes
-    });
-
-    widget.onUploadComplete(function(info) {
-      // Almacena los enlaces de las imágenes subidas en el campo oculto
-      var fotos = document.getElementById('fotos');
-      var fotosArray = fotos.value ? fotos.value.split(',') : [];
-      fotosArray.push(info.cdnUrl);
-
-      // Limitar a 8 fotos
-      if (fotosArray.length > 8) {
-        fotosArray.pop(); // Elimina la foto más antigua si se exceden las 8
-      }
-
-      fotos.value = fotosArray.join(',');
-    });
-
     function mostrarPopup(event) {
-      event.preventDefault(); // Evita el envío automático
-      document.getElementById('popup').style.display = 'block'; // Muestra el popup
-
-      // Esperar 2 segundos y luego enviar el formulario
+      event.preventDefault();
+      document.getElementById('popup').style.display = 'block';
       setTimeout(() => {
         document.getElementById('formulario-publicar').submit();
       }, 2000);
@@ -253,6 +260,14 @@
     function cerrarPopup() {
       document.getElementById('popup').style.display = 'none';
     }
+
+    // Guardar las URLs cargadas en el campo oculto "fotos"
+    uploadcare.registerTab('file', uploadcareTabEffects);
+    const widget = uploadcare.Widget('[role=uploadcare-uploader]');
+    widget.onUploadComplete((info) => {
+      let urls = Array.isArray(info) ? info.map(i => i.cdnUrl) : [info.cdnUrl];
+      document.getElementById('fotos').value = urls.join(', ');
+    });
   </script>
 </body>
 </html>
