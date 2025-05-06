@@ -213,15 +213,20 @@
   </footer>
 
   <script>
-    // Función para mostrar el mensaje emergente
-    function mostrarPopup(event) {
-      event.preventDefault(); // Evita que el formulario se envíe automáticamente
-      document.getElementById('popup').style.display = 'block'; // Muestra el popup
-    }
+   function mostrarPopup(event) {
+    event.preventDefault(); // Evita el envío automático
 
-    // Función para cerrar el popup
-    function cerrarPopup() {
-      document.getElementById('popup').style.display = 'none'; // Oculta el popup
+    document.getElementById('popup').style.display = 'block'; // Muestra el popup
+
+    // Esperar 2 segundos y luego enviar el formulario
+    setTimeout(() => {
+      document.getElementById('formulario-publicar').submit();
+    }, 2000);
+  }
+
+  function cerrarPopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
     }
   </script>
 </body>
