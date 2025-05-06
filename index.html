@@ -247,34 +247,48 @@
   </footer>
 
   <script>
-    let widget;
-    document.addEventListener("DOMContentLoaded", function () {
-      widget = uploadcare.Widget('#uploadcare-input');
-    });
+  function prepararYEnviar() {
+    const widget = uploadcare.Widget('#uploadcare-input');
+    const value = widget.value();
 
-    function prepararYEnviar() {
-      const value = widget.value();
+    if (!value) {
+      alert("Debes subir al menos una imagen.");
+      return;
+    }
 
-      if (!value) {
-        alert("Debes subir al menos una imagen.");
-        return;
+    // Mostrar popup inmediatamente
+    document.getElementById('popup').style.display = 'block';
+
+    // Manejar promesa para imagen única o grupo
+    value.promise().then(fileInfoOrGroup => {
+      let promises = [];
+
+      if (fileInfoOrGroup.files) {
+        // Es un grupo de archivos
+        promises = fileInfoOrGroup.files().map(f => f.promise());
+      } else {
+        // Es una sola imagen
+        promises = [fileInfoOrGroup.promise()];
       }
 
-      uploadcare.fileFrom('uploaded', value).done(function (file) {
-        file.promise().then(function (info) {
-          document.getElementById('fotos').value = info.cdnUrl;
-          document.getElementById('popup').style.display = 'block';
+      Promise.all(promises).then(fileInfos => {
+        const urls = fileInfos.map(f => f.cdnUrl).join('\n');
+        document.getElementById('fotos').value = urls;
 
-          setTimeout(() => {
-            document.getElementById('formulario-publicar').submit();
-          }, 2000);
-        });
+        // Esperar un momento para mostrar el popup y luego enviar
+        setTimeout(() => {
+          document.getElementById('formulario-publicar').submit();
+        }, 2000);
       });
-    }
-
-    function cerrarPopup() {
+    }).catch(() => {
+      alert("Hubo un error al cargar las imágenes.");
       document.getElementById('popup').style.display = 'none';
-    }
+    });
+  }
+
+  function cerrarPopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
   </script>
 </body>
 </html>
