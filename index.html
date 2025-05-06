@@ -1,287 +1,50 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inmuebles Particulares</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-  <script>
-    UPLOADCARE_PUBLIC_KEY = "15b2cae519cdad4a4007";
-    UPLOADCARE_LOCALE = "es";
-    UPLOADCARE_LOCALE_TRANSLATIONS = {
-      buttons: {
-        choose: {
-          files: {
-            one: 'Subir imagen',
-            other: 'Subir imágenes'
-          },
-          images: {
-            one: 'Elegir imagen',
-            other: 'Elegir imágenes'
-          }
-        },
-        cancel: 'Cancelar',
-        remove: 'Remover',
-        removeAll: 'Remover todas',
-        addMore: 'Agregar'
-      }
-    };
-  </script>
-  <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
-  <style>
-    :root {
-      --primary: #00ffe0;
-      --bg: #0f0f0f;
-      --text: #ffffff;
-      --accent: #ff0077;
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Orbitron', sans-serif;
-    }
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-    }
-    header {
-      background: #111;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px #000;
-    }
-    header h1 {
-      color: var(--primary);
-      font-size: 1.5rem;
-    }
-    nav a {
-      color: var(--text);
-      margin-left: 1.5rem;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    nav a:hover {
-      color: var(--accent);
-    }
-    .hero {
-      text-align: center;
-      padding: 5rem 2rem;
-    }
-    .hero h2 {
-      font-size: 2.5rem;
-      color: var(--primary);
-      margin-bottom: 1rem;
-    }
-    .hero p {
-      font-size: 1.2rem;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .cta {
-      margin-top: 2rem;
-    }
-    .cta a {
-      background: var(--accent);
-      color: #fff;
-      padding: 0.75rem 1.5rem;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
-    .cta a:hover {
-      background: #e6006e;
-    }
-    section {
-      margin: 2rem 0;
-      padding: 2rem;
-      background: #222;
-      border-radius: 10px;
-    }
-    #formulario-publicar {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    #formulario-publicar input,
-    #formulario-publicar select,
-    #formulario-publicar textarea {
-      padding: 0.5rem;
-      border-radius: 5px;
-      border: 1px solid #333;
-      background-color: #222;
-      color: #fff;
-    }
-    button {
-      background-color: var(--primary);
-      color: #111;
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 5px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background-color: #00ccaa;
-    }
-    footer {
-      text-align: center;
-      padding: 2rem;
-      font-size: 0.9rem;
-      color: #777;
-    }
-    .popup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #333;
-      color: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Inmuebles Particulares</h1>
-    <nav>
-      <a href="#publicar">Publicar</a>
-      <a href="#ver">Ver Propiedades</a>
-      <a href="#login">Login</a>
-    </nav>
-  </header>
+<script>
+  function prepararYEnviar() {
+    const widget = uploadcare.Widget('#uploadcare-input');
+    const value = widget.value();
 
-  <section class="hero">
-    <h2>Compra, venta y alquiler sin intermediarios</h2>
-    <p>Publicá tu propiedad o encontrá la que buscás. Sin inmobiliarias. Sin comisiones. Solo entre particulares.</p>
-    <div class="cta">
-      <a href="#publicar">¡Publicá tu propiedad!</a>
-    </div>
-  </section>
+    if (!value) {
+      alert("Debes subir al menos una imagen.");
+      return;
+    }
 
-  <section id="publicar">
-    <h2>Publicar Propiedad</h2>
-    <form id="formulario-publicar" action="https://formspree.io/f/xdkggjbb" method="POST">
-      <label for="titulo">Título:</label>
-      <input type="text" id="titulo" name="titulo" required>
+    // Si es un grupo de archivos
+    if (value.startsWith('https://ucarecdn.com/group/')) {
+      uploadcare.loadFileGroup(value)
+        .then(group => {
+          const files = group.files();
+          return Promise.all(files.map(f => f.promise()));
+        })
+        .then(fileInfos => {
+          const urls = fileInfos.map(f => f.cdnUrl).join('\n');
+          enviarFormulario(urls);
+        })
+        .catch(() => {
+          alert("Error al cargar las imágenes.");
+        });
+    } else {
+      // Si es un solo archivo
+      uploadcare.fileFrom('uploaded', value)
+        .then(file => file.promise())
+        .then(fileInfo => {
+          enviarFormulario(fileInfo.cdnUrl);
+        })
+        .catch(() => {
+          alert("Error al cargar la imagen.");
+        });
+    }
+  }
 
-      <label for="tipo">Tipo de propiedad:</label>
-      <select id="tipo" name="tipo" required>
-        <option value="">Seleccionar</option>
-        <option value="departamento">Departamento</option>
-        <option value="casa">Casa</option>
-        <option value="terreno">Terreno</option>
-        <option value="local">Local comercial</option>
-      </select>
+  function enviarFormulario(urls) {
+    document.getElementById('fotos').value = urls;
+    document.getElementById('popup').style.display = 'block';
 
-      <label>Operación:</label>
-      <input type="checkbox" id="venta" name="operacion" value="venta">
-      <label for="venta">Venta</label>
-      <input type="checkbox" id="permuta" name="operacion" value="permuta">
-      <label for="permuta">Permuta</label>
-      <input type="checkbox" id="alquiler" name="operacion" value="alquiler">
-      <label for="alquiler">Alquiler</label>
+    setTimeout(() => {
+      document.getElementById('formulario-publicar').submit();
+    }, 2000);
+  }
 
-      <label for="direccion">Dirección:</label>
-      <input type="text" id="direccion" name="direccion" required>
-
-      <label for="ciudad">Ciudad:</label>
-      <input type="text" id="ciudad" name="ciudad" required>
-
-      <label for="precio">Precio ($):</label>
-      <input type="number" id="precio" name="precio" required>
-
-      <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion" name="descripcion" required></textarea>
-
-      <label for="fotos">Fotos (máx. 8):</label>
-      <input
-        type="hidden"
-        role="uploadcare-uploader"
-        data-multiple
-        data-multiple-max="8"
-        data-clearable
-        data-images-only
-        id="uploadcare-input"
-      />
-      <input type="hidden" name="fotos" id="fotos" />
-
-      <button type="button" onclick="prepararYEnviar()">Publicar Propiedad</button>
-    </form>
-  </section>
-
-  <div class="popup" id="popup">
-    <h3>Tu propiedad está en revisión</h3>
-    <p>En menos de 24 horas la verás publicada.</p>
-    <button onclick="cerrarPopup()">Cerrar</button>
-  </div>
-
-  <footer>
-    <p>© 2025 Inmuebles Particulares - Proyecto independiente para particulares</p>
-  </footer>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const widget = uploadcare.Widget('[role=uploadcare-uploader]');
-
-      window.prepararYEnviar = function () {
-        const campos = ['titulo', 'tipo', 'direccion', 'ciudad', 'precio', 'descripcion'];
-        for (let id of campos) {
-          const campo = document.getElementById(id);
-          if (!campo.value.trim()) {
-            alert("Por favor completá todos los campos obligatorios.");
-            campo.focus();
-            return;
-          }
-        }
-
-        const operaciones = ['venta', 'permuta', 'alquiler'];
-        if (!operaciones.some(id => document.getElementById(id).checked)) {
-          alert("Seleccioná al menos una opción de operación.");
-          return;
-        }
-
-        const value = widget.value();
-        if (!value) {
-          alert("Debes subir al menos una imagen.");
-          return;
-        }
-
-        if (value.startsWith('https://ucarecdn.com/group/')) {
-          uploadcare.loadFileGroup(value)
-            .then(group => Promise.all(group.files().map(f => f.promise())))
-            .then(fileInfos => {
-              const urls = fileInfos.map(f => f.cdnUrl).join('\n');
-              enviarFormulario(urls);
-            })
-            .catch(() => alert("Error al cargar las imágenes."));
-        } else {
-          uploadcare.fileFrom('uploaded', value)
-            .then(file => file.promise())
-            .then(fileInfo => enviarFormulario(fileInfo.cdnUrl))
-            .catch(() => alert("Error al cargar la imagen."));
-        }
-      };
-
-      window.enviarFormulario = function (urls) {
-        document.getElementById('fotos').value = urls;
-        document.getElementById('popup').style.display = 'block';
-        setTimeout(() => {
-          document.getElementById('formulario-publicar').submit();
-        }, 2000);
-      };
-
-      window.cerrarPopup = function () {
-        document.getElementById('popup').style.display = 'none';
-      };
-    });
-  </script>
-</body>
-</html>
+  function cerrarPopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
+</script>
