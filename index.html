@@ -219,10 +219,11 @@
   </footer>
 
   <script>
-    // Configuración de Uploadcare para permitir múltiples fotos
+    // Configuración de Uploadcare para permitir múltiples fotos y mantener la opción de carga abierta
     var widget = uploadcare.Widget('[id="fotos-widget"]', {
       publicKey: '15b2cae519cdad4a4007',
-      multiple: true // Permite seleccionar varias fotos
+      multiple: true, // Permite seleccionar varias fotos
+      imagesOnly: true, // Solo permite imágenes
     });
 
     widget.onUploadComplete(function(info) {
