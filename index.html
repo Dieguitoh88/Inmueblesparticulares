@@ -256,34 +256,37 @@
       return;
     }
 
-    // Mostrar popup inmediatamente
     document.getElementById('popup').style.display = 'block';
 
-    // Manejar promesa para imagen única o grupo
-    value.promise().then(fileInfoOrGroup => {
-      let promises = [];
-
-      if (fileInfoOrGroup.files) {
-        // Es un grupo de archivos
-        promises = fileInfoOrGroup.files().map(f => f.promise());
-      } else {
-        // Es una sola imagen
-        promises = [fileInfoOrGroup.promise()];
-      }
-
-      Promise.all(promises).then(fileInfos => {
-        const urls = fileInfos.map(f => f.cdnUrl).join('\n');
+    // Detecta si es un grupo de imágenes (startsWith 'https://ucarecdn.com/group/')
+    if (value.startsWith("https://ucarecdn.com/group/")) {
+      uploadcare.loadFileGroup(value).then(group => {
+        const urls = group.files().map(file => file.cdnUrl).join('\n');
         document.getElementById('fotos').value = urls;
 
-        // Esperar un momento para mostrar el popup y luego enviar
         setTimeout(() => {
           document.getElementById('formulario-publicar').submit();
         }, 2000);
+      }).catch(() => {
+        alert("Error al cargar las imágenes.");
+        document.getElementById('popup').style.display = 'none';
       });
-    }).catch(() => {
-      alert("Hubo un error al cargar las imágenes.");
-      document.getElementById('popup').style.display = 'none';
-    });
+
+    } else {
+      // Imagen única
+      uploadcare.fileFrom('uploaded', value).then(file => {
+        return file.promise();
+      }).then(fileInfo => {
+        document.getElementById('fotos').value = fileInfo.cdnUrl;
+
+        setTimeout(() => {
+          document.getElementById('formulario-publicar').submit();
+        }, 2000);
+      }).catch(() => {
+        alert("Error al cargar la imagen.");
+        document.getElementById('popup').style.display = 'none';
+      });
+    }
   }
 
   function cerrarPopup() {
