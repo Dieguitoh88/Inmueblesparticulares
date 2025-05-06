@@ -219,14 +219,24 @@
   </footer>
 
   <script>
-    // Subir archivo a Uploadcare y obtener el enlace
+    // Configuración de Uploadcare para permitir múltiples fotos
     var widget = uploadcare.Widget('[id="fotos-widget"]', {
-      publicKey: '15b2cae519cdad4a4007'
+      publicKey: '15b2cae519cdad4a4007',
+      multiple: true // Permite seleccionar varias fotos
     });
 
     widget.onUploadComplete(function(info) {
-      // Aquí guardamos el enlace del archivo subido en el campo oculto
-      document.getElementById('fotos').value = info.cdnUrl;
+      // Almacena los enlaces de las imágenes subidas en el campo oculto
+      var fotos = document.getElementById('fotos');
+      var fotosArray = fotos.value ? fotos.value.split(',') : [];
+      fotosArray.push(info.cdnUrl);
+
+      // Limitar a 8 fotos
+      if (fotosArray.length > 8) {
+        fotosArray.pop(); // Elimina la foto más antigua si se exceden las 8
+      }
+
+      fotos.value = fotosArray.join(',');
     });
 
     function mostrarPopup(event) {
